@@ -1,7 +1,7 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-const Header = () => {
+import Cart from "../Cart/Cart";
+const Header = ({ onCartClick }) => {
   return (
     <>
       {/* Navbar */}
@@ -25,6 +25,9 @@ const Header = () => {
             </li>
           </ul>
         </div>
+        <button className="btn btn-outline-light" onClick={onCartClick}>
+          Cart
+        </button>
       </nav>
 
       {/* Title Section */}
