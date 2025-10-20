@@ -1,38 +1,33 @@
-import React from "react";
+import React, { useContext } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Cart from "../Cart/Cart";
+import { CartContext } from "../../Store/CartContext";
 const Header = ({ onCartClick }) => {
+  const { cartItems } = useContext(CartContext);
   return (
     <>
       {/* Navbar */}
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div className="container justify-content-center">
-          <ul className="navbar-nav">
-            <li className="nav-item mx-3">
-              <a className="nav-link" href="#">
-                HOME
-              </a>
-            </li>
-            <li className="nav-item mx-3">
-              <a className="nav-link" href="#">
-                STORE
-              </a>
-            </li>
-            <li className="nav-item mx-3">
-              <a className="nav-link" href="#">
-                ABOUT
-              </a>
-            </li>
-          </ul>
+      <header className="d-flex justify-content-between align-items-center p-3 bg-dark text-white">
+        <div>
+          <a href="#" className="mx-2 text-white text-decoration-none">
+            Home
+          </a>
+          <a href="#" className="mx-2 text-white text-decoration-none">
+            Store
+          </a>
+          <a href="#" className="mx-2 text-white text-decoration-none">
+            About
+          </a>
         </div>
-        <button className="btn btn-outline-light" onClick={onCartClick}>
-          Cart
+        <h1 className="m-0">The Generics</h1>
+        <button
+          className="btn btn-outline-light position-relative"
+          onClick={onCartClick}
+        >
+          🛒 Cart
+          <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {cartItems.length}
+          </span>
         </button>
-      </nav>
-
-      {/* Title Section */}
-      <header className="bg-secondary text-white text-center py-4">
-        <h1 className="display-5 fw-bold">The Generics</h1>
       </header>
     </>
   );

@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import { CartContext } from "../../Store/CartContext";
 const productsArr = [
   {
     title: "Colors",
@@ -25,6 +25,8 @@ const productsArr = [
 ];
 
 const Products = () => {
+  const { addToCart } = useContext(CartContext);
+
   return (
     <div className="container my-5">
       <h2 className="text-center mb-4">Products</h2>
@@ -41,7 +43,12 @@ const Products = () => {
               <div className="card-body text-center">
                 <h5 className="card-title">{item.title}</h5>
                 <p className="card-text fw-bold">₹{item.price}</p>
-                <button className="btn btn-primary">Add to Cart</button>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => addToCart(item)}
+                >
+                  Add to Cart
+                </button>
               </div>
             </div>
           </div>
