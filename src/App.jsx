@@ -11,6 +11,7 @@ import Cart from "./Components/Cart/Cart";
 import { CartProvider } from "./Store/CartContext";
 import About from "./Components/AboutPage/About";
 import Home from "./Components/Home/Home";
+import Movie from "./Components/Movies/Movie";
 
 const App = () => {
   const [showCart, setShowCart] = useState(false);
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/about" element={<About />} />
 
           <Route path="/store" element={<Product />} />
+          <Route path="/movies" element={<Movie />} />
         </Routes>
 
         {showCart && <Cart showCart={showCart} />}
