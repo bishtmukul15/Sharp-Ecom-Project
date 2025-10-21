@@ -1,37 +1,60 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useState } from "react";
 const API_URL = "https://swapi.dev/api/films";
 const Movie = () => {
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [error, setError] = useState(null);
+  const [retrying, setRetrying] = useState(false);
   // ye ek function bana rahe hain taaki hum usko call kar saken
+  const retryTimeout = useRef(null);
   const fetchMovies = async () => {
+    setIsLoading(true);
+    setError(null);
+    setRetrying(false);
     try {
-      setIsLoading(true);
       const res = await fetch(API_URL);
+      if (!res.ok) {
+        throw new Error("Something went wrong...Retrying");
+      }
       const data = await res.json();
-      console.log(data);
+      //console.log(data);
       setMovies(data.results);
+      setIsLoading(false);
+      if (retryTimeout.current) {
+        clearTimeout(retryTimeout.current);
+        retryTimeout.current = null;
+      }
     } catch (error) {
+      setError(error.message);
       setIsLoading(false);
+      setRetrying(true);
       console.error("Error fetching movies:", error);
-    } finally {
-      setIsLoading(false);
+      retryTimeout.current = setTimeout(() => {
+        fetchMovies();
+      }, 5000);
     }
-    //   fetch(API_URL)
-    //     .then((res) => {
-    //       // response object ko JSON me convert karna zaruri hai
-    //       return res.json();
-    //     })
-    //     .then((data) => {
-    //       console.log("Fetched Data:", data);
-    //       setMovies(data.results || []); // data.results me movies list aati hai
-    //     })
-    //     .catch((err) => {
-    //       console.error("Error fetching movies:", err);
-    //     });
-    // };
   };
+  const cancelRetry = () => {
+    if (retryTimeout.current) {
+      clearTimeout(retryTimeout.current);
+      retryTimeout.current = null;
+      setRetrying(false);
+      setError("Retry cancelled by user");
+    }
+  };
+  //   fetch(API_URL)
+  //     .then((res) => {
+  //       // response object ko JSON me convert karna zaruri hai
+  //       return res.json();
+  //     })
+  //     .then((data) => {
+  //       console.log("Fetched Data:", data);
+  //       setMovies(data.results || []); // data.results me movies list aati hai
+  //     })
+  //     .catch((err) => {
+  //       console.error("Error fetching movies:", err);
+  //     });
+  // };
 
   // useEffect(() => {
   //   fetchMovies(); // function call kar diya
@@ -41,6 +64,9 @@ const Movie = () => {
       <h2>🎬 Star Wars Movies</h2>
       <div>
         <button onClick={fetchMovies}>Fetch List</button>
+      </div>
+      <div>
+        <button onClick={cancelRetry}>Cancel retry</button>
       </div>
       {/* Loading indicator */}
       {isLoading ? (
