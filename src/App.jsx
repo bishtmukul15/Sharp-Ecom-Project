@@ -10,6 +10,8 @@ import Header from "./Components/Header/Header";
 import Cart from "./Components/Cart/Cart";
 import { CartProvider } from "./Store/CartContext";
 import About from "./Components/AboutPage/About";
+import Home from "./Components/Home/Home";
+
 const App = () => {
   const [showCart, setShowCart] = useState(false);
   const handleToggleClick = () => {
@@ -20,10 +22,11 @@ const App = () => {
       <BrowserRouter>
         <Header onCartClick={handleToggleClick} />
         <Routes>
-          <Route path="/" element={<Product />} />
-        </Routes>
-        <Routes>
+          <Route path="/" element={<Home />} />
+
           <Route path="/about" element={<About />} />
+
+          <Route path="/store" element={<Product />} />
         </Routes>
 
         {showCart && <Cart showCart={showCart} />}
