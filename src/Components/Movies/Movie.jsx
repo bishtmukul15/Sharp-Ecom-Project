@@ -1,41 +1,49 @@
 import React, { useEffect, useState } from "react";
 const API_URL = "https://swapi.dev/api/films";
 const Movie = () => {
-  const [movies, setMovies] = useState("");
+  const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // ye ek function bana rahe hain taaki hum usko call kar saken
-    const fetchMovies = async () => {
-      try {
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        console.log(data);
-        setMovies(data.results);
-      } catch (error) {
-        console.error("Error fetching movies:", error);
-      }
-      //   fetch(API_URL)
-      //     .then((res) => {
-      //       // response object ko JSON me convert karna zaruri hai
-      //       return res.json();
-      //     })
-      //     .then((data) => {
-      //       console.log("Fetched Data:", data);
-      //       setMovies(data.results || []); // data.results me movies list aati hai
-      //     })
-      //     .catch((err) => {
-      //       console.error("Error fetching movies:", err);
-      //     });
-      // };
-    };
-    fetchMovies(); // function call kar diya
-  }, []);
+  // ye ek function bana rahe hain taaki hum usko call kar saken
+  const fetchMovies = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch(API_URL);
+      const data = await res.json();
+      console.log(data);
+      setMovies(data.results);
+    } catch (error) {
+      setIsLoading(false);
+      console.error("Error fetching movies:", error);
+    } finally {
+      setIsLoading(false);
+    }
+    //   fetch(API_URL)
+    //     .then((res) => {
+    //       // response object ko JSON me convert karna zaruri hai
+    //       return res.json();
+    //     })
+    //     .then((data) => {
+    //       console.log("Fetched Data:", data);
+    //       setMovies(data.results || []); // data.results me movies list aati hai
+    //     })
+    //     .catch((err) => {
+    //       console.error("Error fetching movies:", err);
+    //     });
+    // };
+  };
+
+  // useEffect(() => {
+  //   fetchMovies(); // function call kar diya
+  // }, []);
   return (
     <div style={{ padding: "20px" }}>
       <h2>🎬 Star Wars Movies</h2>
-
+      <div>
+        <button onClick={fetchMovies}>Fetch List</button>
+      </div>
       {/* Loading indicator */}
-      {movies.length === 0 ? (
+      {isLoading ? (
         <p>Loading movies...</p>
       ) : (
         <ul style={{ listStyle: "none", padding: 0 }}>
