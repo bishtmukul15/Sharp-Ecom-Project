@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState, useEffect } from "react";
 const API_URL = "https://swapi.dev/api/films";
 const Movie = () => {
   const [movies, setMovies] = useState([]);
@@ -7,7 +7,7 @@ const Movie = () => {
   const [retrying, setRetrying] = useState(false);
   // ye ek function bana rahe hain taaki hum usko call kar saken
   const retryTimeout = useRef(null);
-  const fetchMovies = async () => {
+  const fetchMovies = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     setRetrying(false);
@@ -33,7 +33,16 @@ const Movie = () => {
         fetchMovies();
       }, 5000);
     }
-  };
+  }, []);
+  useEffect(() => {
+    fetchMovies();
+    return () => {
+      if (retryTimeout.current) {
+        clearTimeout(retryTimeout.current);
+      }
+    };
+    // function call kar diya
+  }, [fetchMovies]);
   const cancelRetry = () => {
     if (retryTimeout.current) {
       clearTimeout(retryTimeout.current);
@@ -56,9 +65,6 @@ const Movie = () => {
   //     });
   // };
 
-  // useEffect(() => {
-  //   fetchMovies(); // function call kar diya
-  // }, []);
   return (
     <div style={{ padding: "20px" }}>
       <h2>🎬 Star Wars Movies</h2>
@@ -91,7 +97,6 @@ const Movie = () => {
               <p>
                 <strong>Director:</strong> {movie.director}
               </p>
-              <p>{movie.opening_crawl.slice(0, 100)}...</p>
             </li>
           ))}
         </ul>
