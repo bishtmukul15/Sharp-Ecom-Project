@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { CartContext } from "../../Store/CartContext";
+import { NavLink } from "react-router-dom";
 const Header = ({ onCartClick }) => {
   const { cartItems } = useContext(CartContext);
   return (
@@ -8,15 +9,15 @@ const Header = ({ onCartClick }) => {
       {/* Navbar */}
       <header className="d-flex justify-content-between align-items-center p-3 bg-dark text-white">
         <div>
-          <a href="#" className="mx-2 text-white text-decoration-none">
+          <NavLink to="/" className="mx-2 text-white text-decoration-none">
             Home
-          </a>
-          <a href="#" className="mx-2 text-white text-decoration-none">
+          </NavLink>
+          <NavLink to="/store" className="mx-2 text-white text-decoration-none">
             Store
-          </a>
-          <a href="#" className="mx-2 text-white text-decoration-none">
+          </NavLink>
+          <NavLink to="/about" className="mx-2 text-white text-decoration-none">
             About
-          </a>
+          </NavLink>
         </div>
         <h1 className="m-0">The Generics</h1>
         <button
