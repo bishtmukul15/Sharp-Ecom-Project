@@ -1,14 +1,13 @@
 import React, { useCallback, useRef, useState, useEffect } from "react";
 
-const API_URL = "https://swapi.dev/api/films";
+const API_URL =
+  "https://react-http-1c2c7-default-rtdb.asia-southeast1.firebasedatabase.app/movies.json";
 
 const Movie = () => {
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [retrying, setRetrying] = useState(false);
-
-  // 🎬 Form states (controlled inputs)
   const [newMovie, setNewMovie] = useState({
     title: "",
     openingText: "",
@@ -17,7 +16,7 @@ const Movie = () => {
 
   const retryTimeout = useRef(null);
 
-  // 🎯 Fetch movies with retry logic
+  // 🎬 Fetch Movies
   const fetchMovies = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -30,7 +29,19 @@ const Movie = () => {
       }
 
       const data = await res.json();
-      setMovies(data.results);
+
+      // Firebase returns object → convert to array
+      const loadedMovies = [];
+      for (const key in data) {
+        loadedMovies.push({
+          id: key,
+          title: data[key].title,
+          openingText: data[key].openingText,
+          releaseDate: data[key].releaseDate,
+        });
+      }
+
+      setMovies(loadedMovies);
       setIsLoading(false);
 
       if (retryTimeout.current) {
@@ -41,22 +52,20 @@ const Movie = () => {
       setError(error.message);
       setIsLoading(false);
       setRetrying(true);
+
       console.error("Error fetching movies:", error);
 
-      // 🔁 Retry every 5 seconds
       retryTimeout.current = setTimeout(() => {
         fetchMovies();
       }, 5000);
     }
   }, []);
 
-  // 🧹 Clean up retry timer when component unmounts
   useEffect(() => {
     fetchMovies();
+
     return () => {
-      if (retryTimeout.current) {
-        clearTimeout(retryTimeout.current);
-      }
+      if (retryTimeout.current) clearTimeout(retryTimeout.current);
     };
   }, [fetchMovies]);
 
@@ -70,7 +79,7 @@ const Movie = () => {
     }
   };
 
-  // 📝 Handle input change
+  // 📝 Input change handler
   const handleInputChange = (e) => {
     const { id, value } = e.target;
     setNewMovie((prev) => ({
@@ -79,8 +88,8 @@ const Movie = () => {
     }));
   };
 
-  // 🎬 Add movie handler
-  const addMoviesHandler = (e) => {
+  // 🎬 Add Movie (POST to Firebase)
+  const addMoviesHandler = async (e) => {
     e.preventDefault();
 
     const newMovieObj = {
@@ -98,15 +107,47 @@ const Movie = () => {
       return;
     }
 
-    console.log("New Movie Added:", newMovieObj);
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(newMovieObj),
+        headers: { "Content-Type": "application/json" },
+      });
 
-    // Reset form after submission
-    setNewMovie({ title: "", openingText: "", releaseDate: "" });
+      if (!res.ok) throw new Error("Failed to add movie");
+
+      console.log("New Movie Added:", newMovieObj);
+      // 🔁 Fetch again to update UI
+      fetchMovies();
+      setNewMovie({ title: "", openingText: "", releaseDate: "" });
+    } catch (err) {
+      console.error(err);
+      setError("Failed to add movie.");
+    }
+  };
+
+  // ❌ Delete Movie
+  const deleteMovieHandler = async (id) => {
+    try {
+      const res = await fetch(
+        `https://react-http-1c2c7-default-rtdb.asia-southeast1.firebasedatabase.app/movies/${id}.json`,
+        { method: "DELETE" }
+      );
+
+      if (!res.ok) throw new Error("Failed to delete movie");
+
+      // 🔄 Update UI instantly
+      setMovies((prevMovies) => prevMovies.filter((m) => m.id !== id));
+      console.log("Deleted movie with id:", id);
+    } catch (err) {
+      console.error("Error deleting movie:", err);
+      setError("Failed to delete movie.");
+    }
   };
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>🎬 Star Wars Movies</h2>
+      <h2>🎬 Star Wars Movies (Firebase CRUD)</h2>
 
       {/* 🧾 Add Movie Form */}
       <form
@@ -181,7 +222,7 @@ const Movie = () => {
       <ul style={{ listStyle: "none", padding: 0 }}>
         {movies.map((movie) => (
           <li
-            key={movie.episode_id}
+            key={movie.id}
             style={{
               border: "1px solid #ccc",
               borderRadius: "10px",
@@ -192,11 +233,24 @@ const Movie = () => {
           >
             <h3>{movie.title}</h3>
             <p>
-              <strong>Release Date:</strong> {movie.release_date}
+              <strong>Release Date:</strong> {movie.releaseDate}
             </p>
             <p>
-              <strong>Director:</strong> {movie.director}
+              <strong>Opening Text:</strong> {movie.openingText}
             </p>
+            <button
+              onClick={() => deleteMovieHandler(movie.id)}
+              style={{
+                backgroundColor: "#dc3545",
+                color: "white",
+                border: "none",
+                padding: "5px 8px",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
+            >
+              Delete Movie
+            </button>
           </li>
         ))}
       </ul>
