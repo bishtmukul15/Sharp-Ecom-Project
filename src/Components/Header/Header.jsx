@@ -30,6 +30,12 @@ const Header = ({ onCartClick }) => {
           >
             ContactUs
           </NavLink>
+          <NavLink
+            to="/productsPage"
+            className="mx-2 text-white text-decoration-none"
+          >
+            ProductsPage
+          </NavLink>
         </div>
         <h1 className="m-0">The Generics</h1>
         <button

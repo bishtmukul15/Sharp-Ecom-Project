@@ -13,6 +13,8 @@ import About from "./Components/AboutPage/About";
 import Home from "./Components/Home/Home";
 import Movie from "./Components/Movies/Movie";
 import ContactUs from "./Components/ContactUs/ContactUs";
+import ProductsPage from "./Components/ProductsPage/ProductsPage";
+import ProductDetails from "./Components/ProductsPage/ProductDetails";
 const App = () => {
   const [showCart, setShowCart] = useState(false);
   const handleToggleClick = () => {
@@ -30,6 +32,8 @@ const App = () => {
           <Route path="/store" element={<Product />} />
           <Route path="/movies" element={<Movie />} />
           <Route path="/contactUs" element={<ContactUs />} />
+          <Route path="/productsPage" element={<ProductsPage />} />
+          <Route path="/products/:productId" element={<ProductDetails />} />
         </Routes>
 
         {showCart && <Cart showCart={showCart} />}
