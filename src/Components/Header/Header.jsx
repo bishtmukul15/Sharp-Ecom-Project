@@ -24,6 +24,12 @@ const Header = ({ onCartClick }) => {
           >
             Movie
           </NavLink>
+          <NavLink
+            to="/contactUs"
+            className="mx-2 text-white text-decoration-none"
+          >
+            ContactUs
+          </NavLink>
         </div>
         <h1 className="m-0">The Generics</h1>
         <button
