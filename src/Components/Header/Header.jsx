@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { CartContext } from "../../Store/CartContext";
 import { NavLink } from "react-router-dom";
-import Login from "../Auth/Login";
+
 const Header = ({ onCartClick }) => {
   const { cartItems } = useContext(CartContext);
   return (

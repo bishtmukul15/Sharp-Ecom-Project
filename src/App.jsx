@@ -1,10 +1,5 @@
-import React, { useState } from "react";
-import {
-  Routes,
-  Route,
-  createBrowserRouter,
-  BrowserRouter,
-} from "react-router-dom";
+import React, { useContext, useState } from "react";
+import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
 import Product from "../src/Components/Products/Product";
 import Header from "./Components/Header/Header";
 import Cart from "./Components/Cart/Cart";
@@ -17,8 +12,10 @@ import ContactUs from "./Components/ContactUs/ContactUs";
 import ProductsPage from "./Components/ProductsPage/ProductsPage";
 import ProductDetails from "./Components/ProductsPage/ProductDetails";
 import Login from "./Components/Auth/Login";
+import ProtectedRoute from "./Components/ProtectedRoutes/ProtectedRoute";
 const App = () => {
   const [showCart, setShowCart] = useState(false);
+
   const handleToggleClick = () => {
     setShowCart((prev) => !prev);
   };
@@ -29,15 +26,35 @@ const App = () => {
           <Header onCartClick={handleToggleClick} />
           <Routes>
             <Route path="/" element={<Home />} />
-
             <Route path="/about" element={<About />} />
             <Route path="/login" element={<Login />} />
 
-            <Route path="/store" element={<Product />} />
+            <Route
+              path="/store"
+              element={
+                <ProtectedRoute>
+                  <Product />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/productsPage"
+              element={
+                <ProtectedRoute>
+                  <ProductsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/products/:productId"
+              element={
+                <ProtectedRoute>
+                  <ProductDetails />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/movies" element={<Movie />} />
             <Route path="/contactUs" element={<ContactUs />} />
-            <Route path="/productsPage" element={<ProductsPage />} />
-            <Route path="/products/:productId" element={<ProductDetails />} />
           </Routes>
 
           {showCart && <Cart showCart={showCart} />}
