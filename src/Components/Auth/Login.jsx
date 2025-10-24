@@ -40,7 +40,7 @@ const Login = () => {
       }
 
       // ✅ Store token in context + localStorage
-      authCtx.login(data.idToken);
+      authCtx.login(data.idToken, enteredEmail);
 
       // Redirect to Products page
       navigate("/productsPage");

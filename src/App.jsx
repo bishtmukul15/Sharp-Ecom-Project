@@ -3,7 +3,7 @@ import { Routes, Route, BrowserRouter, Navigate } from "react-router-dom";
 import Product from "../src/Components/Products/Product";
 import Header from "./Components/Header/Header";
 import Cart from "./Components/Cart/Cart";
-import { CartProvider } from "./Store/CartContext";
+import CartProvider from "./Store/CartContext";
 import AuthContextProvider from "./Store/AuthContext";
 import About from "./Components/AboutPage/About";
 import Home from "./Components/Home/Home";

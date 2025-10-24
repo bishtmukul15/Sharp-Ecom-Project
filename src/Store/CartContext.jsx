@@ -1,44 +1,94 @@
-import React, { useState } from "react";
+// src/Store/CartContext.jsx
+import React, { useContext, useState, useEffect } from "react";
+import { AuthContext } from "./AuthContext";
 
-// 1️⃣ Create the Context
+// Create the context
 export const CartContext = React.createContext();
 
-// 2️⃣ Create the Provider
-export const CartProvider = ({ children }) => {
+const BASE_URL =
+  "https://crudcrud.com/api/1f62345b62584a989712f041c52464ec/cart";
+
+const CartProvider = ({ children }) => {
+  const { userEmail } = useContext(AuthContext);
   const [cartItems, setCartItems] = useState([]);
 
-  // 🧠 Function to add items to cart
-  const addToCart = (product) => {
-    setCartItems((prevItems) => {
-      const existingItemIndex = prevItems.findIndex(
-        (item) => item.title === product.title
-      );
+  // Clean email (crudcrud doesn’t allow @ or .)
+  const cleanedEmail = userEmail ? userEmail.replace(/[@.]/g, "") : null;
 
-      if (existingItemIndex >= 0) {
-        // increase quantity if already exists
-        const updatedItems = [...prevItems];
-        updatedItems[existingItemIndex].quantity += 1;
-        return updatedItems;
+  // ✅ Add to Cart
+  const addToCart = async (product) => {
+    // 1️⃣ Update local cart first
+    setCartItems((prev) => {
+      const existingItem = prev.find((i) => i.title === product.title);
+      if (existingItem) {
+        return prev.map((item) =>
+          item.title === product.title
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
       } else {
-        // add new item
-        return [...prevItems, { ...product, quantity: 1 }];
+        return [...prev, { ...product, quantity: 1 }];
       }
     });
+
+    // 2️⃣ Save to crudcrud (only if logged in)
+    if (cleanedEmail) {
+      try {
+        await fetch(`${BASE_URL}${cleanedEmail}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...product, quantity: 1 }),
+        });
+      } catch (err) {
+        console.error("❌ Error saving cart item:", err);
+      }
+    }
   };
 
-  // 🧠 Function to remove items from cart
-  const removeFromCart = (title) => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => item.title !== title)
-    );
+  // 🗑️ Remove item from cart
+  const removeFromCart = async (title) => {
+    setCartItems((prev) => prev.filter((item) => item.title !== title));
+
+    if (cleanedEmail) {
+      try {
+        const res = await fetch(`${BASE_URL}${cleanedEmail}`);
+        const data = await res.json();
+
+        const itemToDelete = data.find((item) => item.title === title);
+        if (itemToDelete) {
+          await fetch(`${BASE_URL}${cleanedEmail}/${itemToDelete._id}`, {
+            method: "DELETE",
+          });
+        }
+      } catch (err) {
+        console.error("❌ Error deleting item:", err);
+      }
+    }
   };
 
-  // 🧠 Context value
-  const value = {
-    cartItems,
-    addToCart,
-    removeFromCart,
-  };
+  // 🔄 Fetch cart items on login or page reload
+  useEffect(() => {
+    const fetchCart = async () => {
+      if (!cleanedEmail) return;
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+      try {
+        const res = await fetch(`${BASE_URL}${cleanedEmail}`);
+        if (!res.ok) throw new Error("Failed to fetch cart data");
+        const data = await res.json();
+        setCartItems(data);
+      } catch (err) {
+        console.error("❌ Error fetching cart:", err);
+      }
+    };
+
+    fetchCart();
+  }, [cleanedEmail]);
+
+  return (
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart }}>
+      {children}
+    </CartContext.Provider>
+  );
 };
+
+export default CartProvider;
