@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { CartContext } from "../../Store/CartContext";
 import { NavLink } from "react-router-dom";
+import Login from "../Auth/Login";
 const Header = ({ onCartClick }) => {
   const { cartItems } = useContext(CartContext);
   return (
@@ -17,6 +18,9 @@ const Header = ({ onCartClick }) => {
           </NavLink>
           <NavLink to="/about" className="mx-2 text-white text-decoration-none">
             About
+          </NavLink>
+          <NavLink to="/login" className="mx-2 text-white text-decoration-none">
+            Login
           </NavLink>
           <NavLink
             to="/movies"
